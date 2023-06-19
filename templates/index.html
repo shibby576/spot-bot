@@ -30,20 +30,65 @@
 </head>
 
 <body>
-    
+    <h1>Spotify OAuth Demo</h1>
+    <button id="authorizeBtn">Authorize Spotify</button>
+    <p id="authStatus"></p>
+    <input type="text" id="inputText" placeholder="Enter text">
+    <button id="submitBtn">Submit</button>
+    <p id="resultText"></p>
+    <script>
+        // Get URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
 
-    <div class="container">
-        <div class="row">
-            <div class="col-12 text-center">
-                <h1>Spotbot!!</h1>
-                
-            </div>
-            
-            
-        
-            
-        </div>
-        
+        if (urlParams.get('auth_success') === '1') {
+            document.getElementById('authStatus').textContent = 'Authenticated';
+        } else if (urlParams.get('auth_error') === '1') {
+            document.getElementById('authStatus').textContent = 'Error: Authentication failed';
+        }
+
+        // Other code...
+    </script>
+    <script>
+        const clientId = "{{ client_id }}";
+        const redirectUri = "{{ redirect_uri }}";
+        const scope = "{{ scope }}";
+
+        const authorizeBtn = document.getElementById("authorizeBtn");
+
+        authorizeBtn.addEventListener("click", () => {
+            const authUrl = `https://accounts.spotify.com/authorize?client_id=${clientId}&response_type=code&redirect_uri=${redirectUri}&scope=${scope}&show_dialog=true`;
+            window.location.href = authUrl;
+        });
+    </script>
+    <script>
+        const inputText = document.getElementById("inputText");
+        const submitBtn = document.getElementById("submitBtn");
+        const resultText = document.getElementById("resultText");
+
+        submitBtn.addEventListener("click", async () => {
+            const text = inputText.value.trim();
+            if (text) {
+                try {
+                    const response = await fetch('/submit', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({text: text})
+                    });
+                    const result = await response.json();
+                    if (result.error) {
+                        resultText.textContent = 'Error: ' + result.error;
+                    } else {
+                        resultText.textContent = result.result;
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    resultText.textContent = 'Error: ' + error;
+                }
+            }
+        });
+    </script>
 </body>
 
 </html>
