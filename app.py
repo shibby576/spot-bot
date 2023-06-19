@@ -7,8 +7,7 @@ from langchain.agents import AgentType, initialize_agent
 from langchain.chat_models import ChatOpenAI
 import tools
 from dotenv import load_dotenv
-import os
-import json
+
 
 load_dotenv()
 
