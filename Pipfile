@@ -9,6 +9,7 @@ gunicorn = "*"
 flask = "*"
 requests = "*"
 langchain = "*"
+openai = "*"
 
 [dev-packages]
 
