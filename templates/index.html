@@ -21,7 +21,24 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
     
     <style>
-    
+        body {background-color: rgb(8, 8, 8);}
+        .custom-image {
+        max-width: 300px;
+        margin: 0 auto;
+        }
+        .loading-spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+            }
 
     </style>
 
@@ -30,12 +47,25 @@
 </head>
 
 <body>
-    <h1>Spotify OAuth Demo</h1>
-    <button id="authorizeBtn">Authorize Spotify</button>
-    <p id="authStatus"></p>
-    <input type="text" id="inputText" placeholder="Enter text">
-    <button id="submitBtn">Submit</button>
-    <p id="resultText"></p>
+    <div class="container">
+        <div class="row">
+            <div class="col-12 text-center">
+                <h1 class="text-white">Spotbot</h1>
+                <button type="button" class="btn btn-primary btn-lg btn btn-success" id="authorizeBtn">Sign into Spotify</button>
+                <p class="text-white" id="authStatus"></p>
+                <div class="input-group">
+                    <input type="text" class="form-control" id="inputText" placeholder="Enter Spotbot command">
+                    <div class="input-group-append">
+                        <button class="btn btn-success" type="submit" id="submitBtn">Submit</button>
+                        <div class="loading-spinner" id="loading-spinner" style="display: none;"></div>
+                    </div>
+                </div>
+            
+                <p class="text-white"  id="resultText"></p>
+            </div>
+        </div>
+    </div>
+    
     <script>
         // Get URL parameters
         const urlParams = new URLSearchParams(window.location.search);
@@ -46,7 +76,6 @@
             document.getElementById('authStatus').textContent = 'Error: Authentication failed';
         }
 
-        // Other code...
     </script>
     <script>
         const clientId = "{{ client_id }}";
@@ -69,6 +98,13 @@
             const text = inputText.value.trim();
             if (text) {
                 try {
+                    // Show the loading spinner
+                    document.getElementById('loading-spinner').style.display = 'block';
+
+                    // Disable the 'Submit' button
+                    const submitBtn = $("button[type='submit']");
+                    submitBtn.prop("disabled", true);
+
                     const response = await fetch('/submit', {
                         method: 'POST',
                         headers: {
@@ -80,9 +116,16 @@
                     if (result.error) {
                         resultText.textContent = 'Error: ' + result.error;
                     } else {
+                        // Hide the loading spinner and enable the ask button
+                        document.getElementById('loading-spinner').style.display = 'none';
+                        submitBtn.prop("disabled", false);
                         resultText.textContent = result.result;
                     }
                 } catch (error) {
+                    // Hide the loading spinner and enable the ask button
+                    document.getElementById('loading-spinner').style.display = 'none';
+                    submitBtn.prop("disabled", false);
+
                     console.error('Error:', error);
                     resultText.textContent = 'Error: ' + error;
                 }

@@ -18,7 +18,8 @@ client_secret = os.getenv('client_secret')
 app.secret_key = os.getenv('app.secret_key')
 OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
 
-redirect_uri = 'https://www.spot-bot.xyz/callback'
+redirect_uri = 'http://localhost:5000/callback'
+# redirect_uri = 'https://www.spot-bot.xyz/callback'
 authorization_base_url = 'https://accounts.spotify.com/authorize'
 token_url = 'https://accounts.spotify.com/api/token'
 scopes=['app-remote-control', 'playlist-modify-private', 'playlist-modify-public', 'playlist-read-collaborative', 'playlist-read-private', 'streaming', 'ugc-image-upload', 'user-follow-modify', 'user-follow-read', 'user-library-modify', 'user-library-read', 'user-modify-playback-state', 'user-read-currently-playing', 'user-read-email', 'user-read-playback-position', 'user-read-playback-state', 'user-read-private', 'user-read-recently-played', 'user-top-read']
@@ -28,7 +29,7 @@ tools = createTools()
 #import openai and set llm
 
 llm = ChatOpenAI(temperature=0)
-agent = initialize_agent(tools, llm, agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION,max_iterations=5,handle_parsing_errors=True, verbose=True,max_execution_time=5)
+agent = initialize_agent(tools, llm, agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION,max_iterations=6,handle_parsing_errors=True, verbose=True,max_execution_time=10)
 
 
 @app.route('/')
@@ -57,10 +58,6 @@ def callback():
     #save auth header as session variable
     session['auth_header'] = {'Authorization': f'Bearer {access_token}'}
 
-    # if access_token and refresh_token:
-    #     return jsonify(access_token=access_token, refresh_token=refresh_token)
-    # else:
-    #     return jsonify(error=tokens.get('error', 'Unknown error'))
     if access_token and refresh_token:
         # Redirect to the index page with a "success" URL parameter
         return redirect(url_for('home') + '?auth_success=1')
