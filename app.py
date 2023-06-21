@@ -9,6 +9,7 @@ import tools
 from dotenv import load_dotenv
 
 
+
 load_dotenv()
 
 app = Flask(__name__)
@@ -18,8 +19,8 @@ client_secret = os.getenv('client_secret')
 app.secret_key = os.getenv('app.secret_key')
 OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
 
-# redirect_uri = 'http://localhost:5000/callback'
-redirect_uri = 'https://www.spot-bot.xyz/callback'
+redirect_uri = 'http://localhost:5000/callback'
+# redirect_uri = 'https://www.spot-bot.xyz/callback'
 authorization_base_url = 'https://accounts.spotify.com/authorize'
 token_url = 'https://accounts.spotify.com/api/token'
 scopes=['app-remote-control', 'playlist-modify-private', 'playlist-modify-public', 'playlist-read-collaborative', 'playlist-read-private', 'streaming', 'ugc-image-upload', 'user-follow-modify', 'user-follow-read', 'user-library-modify', 'user-library-read', 'user-modify-playback-state', 'user-read-currently-playing', 'user-read-email', 'user-read-playback-position', 'user-read-playback-state', 'user-read-private', 'user-read-recently-played', 'user-top-read']
@@ -72,8 +73,13 @@ def submit():
         return jsonify(error='Invalid input')
     
     result = agent.run(input_text)
-    
+
+
     return jsonify(result=result)
+
+
+
+
 
 if __name__ == '__main__':
     app.run(debug=True)

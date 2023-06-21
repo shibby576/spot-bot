@@ -33,12 +33,18 @@
             width: 40px;
             height: 40px;
             animation: spin 1s linear infinite;
+            margin-left: auto;
+            margin-right: auto
             }
 
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
             }
+        #authorizeBtn{
+            margin-top: 5px;
+            margin-bottom: 20px; 
+        }
 
     </style>
 
@@ -51,33 +57,47 @@
         <div class="row">
             <div class="col-12 text-center">
                 <h1 class="text-white">Spotbot</h1>
-                <button type="button" class="btn btn-primary btn-lg btn btn-success" id="authorizeBtn">Sign into Spotify</button>
-                <p class="text-white" id="authStatus"></p>
+                <a href="https://forms.gle/psYb8GV6Go1jY8uU8" target="_blank">Request access</a>
+                <p class="text-white" id="authStatus">Connect your account to get started</p>
+                <button type="button" class="btn btn-primary btn-md btn btn-success" id="authorizeBtn">Sign into Spotify</button>
                 <div class="input-group">
                     <input type="text" class="form-control" id="inputText" placeholder="Enter Spotbot command">
                     <div class="input-group-append">
-                        <button class="btn btn-success" type="submit" id="submitBtn">Submit</button>
-                        <div class="loading-spinner" id="loading-spinner" style="display: none;"></div>
+                        <button class="btn btn-success" type="submit" id="submitBtn" disabled>Submit</button>
                     </div>
+                    
                 </div>
-            
+                <div class="loading-spinner" id="loading-spinner" style="display: none;"></div>
                 <p class="text-white"  id="resultText"></p>
             </div>
         </div>
     </div>
     
     <script>
+        // Script to adjust page after spotify authentication
         // Get URL parameters
         const urlParams = new URLSearchParams(window.location.search);
 
         if (urlParams.get('auth_success') === '1') {
-            document.getElementById('authStatus').textContent = 'Authenticated';
+            document.getElementById('authStatus').textContent = 'Connected and ready to go!';
+            // Select the button element by its ID
+            var button = document.getElementById('submitBtn');
+
+            // Remove the 'disabled' attribute to enable the button
+            button.removeAttribute('disabled');
+
+            //Change style of sign in button
+            var signin_button = document.getElementById('authorizeBtn');
+            signin_button.className='btn btn-md btn-outline-success'
+            signin_button.textContent = 'Spotify added'
+
         } else if (urlParams.get('auth_error') === '1') {
-            document.getElementById('authStatus').textContent = 'Error: Authentication failed';
+            document.getElementById('authStatus').textContent = 'Somethings up. Try to sign in again';
         }
 
     </script>
     <script>
+        //Spotify Authentication
         const clientId = "{{ client_id }}";
         const redirectUri = "{{ redirect_uri }}";
         const scope = "{{ scope }}";
@@ -90,6 +110,7 @@
         });
     </script>
     <script>
+        //Submit request and get result
         const inputText = document.getElementById("inputText");
         const submitBtn = document.getElementById("submitBtn");
         const resultText = document.getElementById("resultText");
@@ -104,6 +125,9 @@
                     // Disable the 'Submit' button
                     const submitBtn = $("button[type='submit']");
                     submitBtn.prop("disabled", true);
+
+                    //show thinking text
+                    resultText.textContent = 'Thinking...'
 
                     const response = await fetch('/submit', {
                         method: 'POST',
