@@ -156,7 +156,10 @@
                         // Hide the loading spinner and enable the ask button
                         document.getElementById('loading-spinner').style.display = 'none';
                         submitBtn.prop("disabled", false);
-                        resultText.textContent = result.result;
+
+                         // Add JSON.stringify() to convert the result.result object to a JSON string
+                        resultText.textContent = JSON.stringify(result.result, null, 2);
+                        
                     }
                 } catch (error) {
                     // Hide the loading spinner and enable the ask button

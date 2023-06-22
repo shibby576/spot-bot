@@ -10,6 +10,7 @@ from dotenv import load_dotenv
 
 
 
+
 load_dotenv()
 
 app = Flask(__name__)
@@ -19,7 +20,7 @@ client_secret = os.getenv('client_secret')
 app.secret_key = os.getenv('app.secret_key')
 OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
 
-# redirect_uri = 'http://localhost:5000/callback'
+#redirect_uri = 'http://localhost:5000/callback'
 redirect_uri = 'https://www.spot-bot.xyz/callback'
 authorization_base_url = 'https://accounts.spotify.com/authorize'
 token_url = 'https://accounts.spotify.com/api/token'
@@ -30,7 +31,7 @@ tools = createTools()
 #import openai and set llm
 
 llm = ChatOpenAI(temperature=0)
-agent = initialize_agent(tools, llm, agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION,max_iterations=6,handle_parsing_errors=True, verbose=True,max_execution_time=10)
+agent = initialize_agent(tools, llm, agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION,max_iterations=6,handle_parsing_errors=True, verbose=True,max_execution_time=10,return_intermediate_steps=True)
 
 
 @app.route('/')
@@ -72,10 +73,41 @@ def submit():
     if not input_text:
         return jsonify(error='Invalid input')
     
-    result = agent.run(input_text)
+    result = agent(input_text)
+   # Serialize the agent_response object
+    serialized_agent_response = serialize_agent_response(result)
+    print(serialized_agent_response)
+
+    return jsonify(result=serialized_agent_response)
 
 
-    return jsonify(result=result)
+
+from requests.models import Response  
+
+def serialize_agent_response(agent_response):
+    new_intermediate_steps = []
+
+    for step in agent_response['intermediate_steps']:
+        serialized_step = []
+
+        for item in step:
+            if isinstance(item, Response):
+                serialized_item = {
+                    'status_code': item.status_code,
+                    'reason': item.reason,
+                    'text': item.text  
+                }
+            else:
+                serialized_item = item
+
+            serialized_step.append(serialized_item)
+
+        new_intermediate_steps.append(tuple(serialized_step))
+
+    serialized_agent_response = agent_response.copy()
+    serialized_agent_response['intermediate_steps'] = new_intermediate_steps
+
+    return serialized_agent_response
 
 
 
