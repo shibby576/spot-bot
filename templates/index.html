@@ -26,6 +26,11 @@
         max-width: 300px;
         margin: 0 auto;
         }
+        #responseList {
+            list-style-type: none;
+            padding: 0;
+            text-align: left;
+        }
         .loading-spinner {
             border: 4px solid #f3f3f3;
             border-top: 4px solid #3498db;
@@ -69,6 +74,7 @@
                 </div>
                 <div class="loading-spinner" id="loading-spinner" style="display: none;"></div>
                 <p class="text-white"  id="resultText"></p>
+                <ul class="text-white" id="responseList"></ul>
             </div>
         </div>
         <div class="row">
@@ -157,12 +163,97 @@
                         document.getElementById('loading-spinner').style.display = 'none';
                         submitBtn.prop("disabled", false);
 
-                         // Add JSON.stringify() to convert the result.result object to a JSON string
-                        resultText.textContent = JSON.stringify(result.result, null, 2);
+                        //hide thinking text
+                        resultText.style.display = 'none'
+                        
+                        //parse response
+                        const apiResponse = result.result
+
+                        function addListItem(label, text, color) {
+                            let list = document.querySelector('#responseList');
+                            let listItem = document.createElement('li');
+                            listItem.textContent = label + ': ' + text;
+
+                            // Assign color based on label
+                            switch(label) {
+                                case 'Thought':
+                                case 'Input: ':
+                                    listItem.style.color = 'green';
+                                    break;
+                                case 'Action':
+                                case 'Action Input':
+                                    listItem.style.color = 'white';
+                                    break;
+                                case 'Observation':
+                                    listItem.style.color = 'blue';
+                                    break;
+                                case 'Final thought':
+                                    listItem.style.color = 'blue';
+                                    break;
+                            }
+
+                            list.appendChild(listItem);
+                        }
+
+                        addListItem('Input: ', apiResponse.input, 'green');
+                        apiResponse.intermediate_steps.forEach(step => {
+                            let thoughtParts = step[0].log.split('\n');
+                            thoughtParts.pop(); // Remove Action Input line
+                            thoughtParts.pop(); // Remove Action line
+                            let cleanedThought = thoughtParts.join('\n'); 
+
+                            addListItem('Thought', cleanedThought, 'green');
+                            addListItem('Action', step[0].tool, 'white');
+                            addListItem('Action Input', step[0].tool_input, 'white');
+                            if (typeof step[1] === "object") {
+                                for (const key in step[1]) {
+                                    addListItem('Observation (' + key + ')', step[1][key], 'blue');
+                                }
+                            } else {
+                                addListItem('Observation', step[1], 'blue');
+                            }
+                        })
+                        addListItem('Final thought', apiResponse.output, 'blue');
+
+
+
+
+                        // function addListItem(label, text) {
+                        //     let list = document.querySelector('#responseList');
+                        //     let listItem = document.createElement('li');
+                        //     listItem.textContent = label + ': ' + text;
+                        //     list.appendChild(listItem);
+                        // }
+
+                        // addListItem('Input: ', apiResponse.input);
+                        // apiResponse.intermediate_steps.forEach(step => {
+                        //     let thoughtParts = step[0].log.split('\n');
+                        //     thoughtParts.pop(); // Remove Action Input line
+                        //     thoughtParts.pop(); // Remove Action line
+                        //     let cleanedThought = thoughtParts.join('\n'); // Rejoin the remaining lines
+
+                        //     addListItem('Thought', cleanedThought);
+                        //     addListItem('Action', step[0].tool);
+                        //     addListItem('Action Input', step[0].tool_input);
+                        //     if (typeof step[1] === "object") {
+                        //         for (const key in step[1]) {
+                        //             addListItem('Observation (' + key + ')', step[1][key]);
+                        //         }
+                        //     } else {
+                        //         addListItem('Observation', step[1]);
+                        //     }
+                        // })
+                        // addListItem('Final thought', apiResponse.output);
+
+                        
+
+                        // Add JSON.stringify() to convert the result.result object to a JSON string
+                        //resultText.textContent = JSON.stringify(result.result, null, 2);
                         
                     }
                 } catch (error) {
                     // Hide the loading spinner and enable the ask button
+                    const submitBtn = $("button[type='submit']");
                     document.getElementById('loading-spinner').style.display = 'none';
                     submitBtn.prop("disabled", false);
 

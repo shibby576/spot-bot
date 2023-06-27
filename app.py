@@ -20,7 +20,7 @@ client_secret = os.getenv('client_secret')
 app.secret_key = os.getenv('app.secret_key')
 OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
 
-#redirect_uri = 'http://localhost:5000/callback'
+# redirect_uri = 'http://localhost:5000/callback'
 redirect_uri = 'https://www.spot-bot.xyz/callback'
 authorization_base_url = 'https://accounts.spotify.com/authorize'
 token_url = 'https://accounts.spotify.com/api/token'
@@ -76,7 +76,8 @@ def submit():
     result = agent(input_text)
    # Serialize the agent_response object
     serialized_agent_response = serialize_agent_response(result)
-    print(serialized_agent_response)
+
+    print('serialized ' + str(serialized_agent_response))
 
     return jsonify(result=serialized_agent_response)
 
