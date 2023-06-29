@@ -165,6 +165,9 @@
 
                         //hide thinking text
                         resultText.style.display = 'none'
+
+                        //Clear list in case there was a reponse there
+                        document.getElementById("responseList").innerHTML = "";
                         
                         //parse response
                         const apiResponse = result.result
@@ -177,17 +180,15 @@
                             // Assign color based on label
                             switch(label) {
                                 case 'Thought':
-                                case 'Input: ':
+                                case 'Final thought':
                                     listItem.style.color = 'green';
                                     break;
-                                case 'Action':
+                                case 'Input':
                                 case 'Action Input':
+                                case 'Observation':
                                     listItem.style.color = 'white';
                                     break;
-                                case 'Observation':
-                                    listItem.style.color = 'blue';
-                                    break;
-                                case 'Final thought':
+                                case 'Action':
                                     listItem.style.color = 'blue';
                                     break;
                             }
@@ -195,7 +196,7 @@
                             list.appendChild(listItem);
                         }
 
-                        addListItem('Input: ', apiResponse.input, 'green');
+                        addListItem('Input', apiResponse.input, 'green');
                         apiResponse.intermediate_steps.forEach(step => {
                             let thoughtParts = step[0].log.split('\n');
                             thoughtParts.pop(); // Remove Action Input line
