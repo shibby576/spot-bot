@@ -59,7 +59,7 @@ class SearchSchema(BaseModel):
 
 class searchSong(BaseTool):
     name = "Search"
-    description = "useful for when you need to search for a song or artist to play on spotify. This returns the uri that can be used to play the song"
+    description = "useful for when you need to search for a song or artist to play on spotify. This returns the uri that can be used to play the song, add it to queue, or find a similar song."
     args_schema: Type[SearchSchema] = SearchSchema
     
     def _run(self,query):
@@ -99,7 +99,7 @@ class playSong(BaseTool):
 
 class checkSong(BaseTool):
     name = "Check"
-    description = "useful for when you need to find out if there is a song playing on spotify or if you need to get the uri of the current song playing. It returns the URI of the current song playing."
+    description = "useful for when you need to find out if there is a song playing on spotify or if you need to get the uri of the current song playing in order to find a similar song. It returns the URI of the current song playing."
 
     def _run(self,song):
         """Use the tool."""
@@ -116,7 +116,7 @@ class checkSong(BaseTool):
 #Play a song similar to the current one
 
 class similarSongSchema(BaseModel):
-    track: str = Field(description="should be a uri string that looks like spotify:track:1kKYjjfNYxE0YYgLa7vgVY")
+    track: str = Field(description="This is required and is a uri string that looks like spotify:track:1kKYjjfNYxE0YYgLa7vgVY. Get this from the check tool.")
 
 class findSimilarSong(BaseTool):
     name = "Find similar song"
