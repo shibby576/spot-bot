@@ -1,4 +1,7 @@
 # SpotBot: Autonomous Spotify agent and DJ
+
+<img src="static/images/spot_demo_fast.gif" width="800">
+
 SpotBot is your Spotify sidekick who can control your music player, find similar songs, and add songs to your queue. 
 
 The purpose of this project was to learn how to build an agent with Langchain that could display its reasoning capabilities by using several tools in sequence and by taking an action that could be seen immediately. Fortunately, Spotify's developer friendly API has many of the components necessary to enable these types of multi-step actions. 
